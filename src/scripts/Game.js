@@ -1,5 +1,7 @@
 // @ts-check
 
+import InputHandler from "./InputHandler.js";
+
 export default class Game {
     /**
      * @type {CanvasRenderingContext2D}
@@ -7,6 +9,13 @@ export default class Game {
      * @private
      */
     ctx;
+
+    /**
+     * @type {InputHandler}
+     * @readonly
+     * @private
+     */
+    inputHandler;
 
     /**
      * @typedef {Object} Scene
@@ -20,7 +29,7 @@ export default class Game {
      * @private
      */
     scene = {
-        size: 300,
+        size: 400,
         objectsColor: "#000000",
         backgroundColor: "#ffffff",
     };
@@ -29,6 +38,7 @@ export default class Game {
      * @typedef {Object} Player
      * @property {number} position Player x position on the scene
      * @property {number} size Player size
+     * @property {number} speed Player speed
      */
     /**
      * @type {Player}
@@ -38,12 +48,14 @@ export default class Game {
     player = {
         position: 0,
         size: 25,
+        speed: 1,
     };
 
     /**
      * @param {HTMLCanvasElement} canvas Game canvas element
      */
     constructor(canvas) {
+        this.inputHandler = new InputHandler();
         this.ctx = /** @type {CanvasRenderingContext2D} */ (
             canvas.getContext("2d")
         );
@@ -68,7 +80,21 @@ export default class Game {
      * @private
      */
     update(deltaTime) {
-        //
+        if (this.inputHandler.isHeld("ArrowRight")) {
+            this.player.position += (this.player.speed / 10) * deltaTime;
+            if (this.player.position > this.scene.size / 2 - this.player.size) {
+                this.player.position = this.scene.size / 2 - this.player.size;
+            }
+        }
+        if (this.inputHandler.isHeld("ArrowLeft")) {
+            this.player.position -= (this.player.speed / 10) * deltaTime;
+            if (
+                this.player.position <
+                -this.scene.size / 2 + this.player.size
+            ) {
+                this.player.position = -this.scene.size / 2 + this.player.size;
+            }
+        }
     }
 
     /**
@@ -116,7 +142,7 @@ export default class Game {
          * @param {number} currTime - Current time
          * @returns {void}
          */
-        function loop(currTime) {
+        const loop = (currTime) => {
             deltaTime = currTime - prevTime;
             if (deltaTime < treshold) {
                 requestAnimationFrame(loop.bind(this));
@@ -126,7 +152,7 @@ export default class Game {
             this.update(deltaTime);
             this.render();
             requestAnimationFrame(loop.bind(this));
-        }
+        };
         // Starts loop
         requestAnimationFrame(loop.bind(this));
     }
