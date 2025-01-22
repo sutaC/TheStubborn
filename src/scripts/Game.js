@@ -9,7 +9,39 @@ export default class Game {
     ctx;
 
     /**
-     * @param {HTMLCanvasElement} canvas - Game canvas element
+     * @typedef {Object} Scene
+     * @property {number} size
+     * @property {string} objectsColor
+     * @property {string} backgroundColor
+     */
+    /**
+     * @type {Scene}
+     * @readonly
+     * @private
+     */
+    scene = {
+        size: 300,
+        objectsColor: "#000000",
+        backgroundColor: "#ffffff",
+    };
+
+    /**
+     * @typedef {Object} Player
+     * @property {number} position Player x position on the scene
+     * @property {number} size Player size
+     */
+    /**
+     * @type {Player}
+     * @readonly
+     * @private
+     */
+    player = {
+        position: 0,
+        size: 25,
+    };
+
+    /**
+     * @param {HTMLCanvasElement} canvas Game canvas element
      */
     constructor(canvas) {
         this.ctx = /** @type {CanvasRenderingContext2D} */ (
@@ -45,11 +77,29 @@ export default class Game {
      * @private
      */
     render() {
-        // Clears
-        this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-        // Draws
-        this.ctx.fillStyle = "white";
-        this.ctx.fillText("Hello World!", 16, 16);
+        // Clears canvas
+        this.ctx.fillStyle = this.scene.objectsColor;
+        this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        // Draws board
+        this.ctx.fillStyle = this.scene.backgroundColor;
+        this.ctx.fillRect(
+            this.ctx.canvas.width / 2 - this.scene.size / 2,
+            this.ctx.canvas.height / 2 - this.scene.size / 2,
+            this.scene.size,
+            this.scene.size
+        );
+        // Objects
+        this.ctx.fillStyle = this.scene.objectsColor;
+        this.ctx.beginPath();
+        this.ctx.arc(
+            this.ctx.canvas.width / 2 + this.player.position,
+            this.ctx.canvas.height / 2 + this.scene.size / 2 - this.player.size,
+            this.player.size,
+            0,
+            2 * Math.PI
+        );
+        this.ctx.closePath();
+        this.ctx.fill();
     }
 
     /**
