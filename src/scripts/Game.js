@@ -43,8 +43,9 @@ export default class Game {
     /**
      * @typedef {Object} Player
      * @property {number} x Player x position on the scene
+     * @property {number} y Player y position on the scene
      * @property {number} size Player size
-     * @property {number} speed Player speed
+     * @property {Vec2d} velocity Ball valocity
      */
     /**
      * @type {Player}
@@ -53,8 +54,9 @@ export default class Game {
      */
     player = {
         x: 0,
+        y: 0,
         size: 20,
-        speed: 1,
+        velocity: { x: 0, y: 0 },
     };
 
     /**
@@ -106,17 +108,43 @@ export default class Game {
      */
     update(deltaTime) {
         // Player
+        this.player.y = -this.scene.size / 2 + this.player.size;
         if (this.inputHandler.isHeld("ArrowRight")) {
-            this.player.x += (this.player.speed / 10) * deltaTime;
-            if (this.player.x >= this.scene.size / 2 - this.player.size) {
-                this.player.x = this.scene.size / 2 - this.player.size - 1;
-            }
+            this.player.velocity.x += 0.01 * deltaTime;
+            this.player.velocity.x = Math.min(1, this.player.velocity.x);
+        } else if (this.inputHandler.isHeld("ArrowLeft")) {
+            this.player.velocity.x -= 0.01 * deltaTime;
+            this.player.velocity.x = Math.max(-1, this.player.velocity.x);
         }
-        if (this.inputHandler.isHeld("ArrowLeft")) {
-            this.player.x -= (this.player.speed / 10) * deltaTime;
-            if (this.player.x <= -this.scene.size / 2 + this.player.size) {
-                this.player.x = -this.scene.size / 2 + this.player.size + 1;
-            }
+
+        if (this.player.velocity.x < 0) {
+            this.player.velocity.x += 0.033;
+        } else if (this.player.velocity.x > 0) {
+            this.player.velocity.x -= 0.033;
+        }
+
+        this.player.x += this.player.velocity.x;
+        if (this.player.x >= this.scene.size / 2 - this.player.size) {
+            this.player.x = this.scene.size / 2 - this.player.size - 1;
+        } else if (this.player.x <= -this.scene.size / 2 + this.player.size) {
+            this.player.x = -this.scene.size / 2 + this.player.size + 1;
+        }
+        // Objects collision
+        if (
+            Math.sqrt(
+                (this.ball.x - this.player.x) ** 2 +
+                    (this.ball.y - this.player.y) ** 2
+            ) <=
+            this.player.size + this.ball.size
+        ) {
+            this.ball.velocity.x *= -0.33;
+            this.ball.velocity.y *= -0.33;
+            this.ball.velocity.x +=
+                (this.ball.x - this.player.x) /
+                (this.ball.size + this.player.size);
+            this.ball.velocity.y +=
+                (this.ball.y - this.player.y) /
+                (this.ball.size + this.player.size);
         }
         // Ball
         this.ball.velocity.y -= 0.01;
@@ -132,6 +160,7 @@ export default class Game {
             // TODO:
             // score = 0
             // bestScore ?< = score
+            this.ball.x = 0;
             this.ball.y = 0;
             this.ball.velocity.x = 0;
             this.ball.velocity.y = 0;
