@@ -164,6 +164,20 @@ export default class Game {
             this.ball.velocity.y +=
                 (this.ball.y - this.player.y) /
                 (this.ball.size + this.player.size);
+            // Prevents ball collapsing
+            const diffAngle = Math.atan2(
+                Math.abs(this.ball.y - this.player.y),
+                Math.abs(this.ball.x - this.player.x)
+            );
+            // [!] Condition here required becouse `Math.atan2(...)` reduces angle and ball flickers on left side
+            this.ball.x =
+                this.player.x +
+                (this.ball.x < this.player.x ? -1 : 1) *
+                    Math.cos(diffAngle) *
+                    (this.ball.size + this.player.size);
+            this.ball.y =
+                this.player.y +
+                Math.sin(diffAngle) * (this.ball.size + this.player.size);
             // Adds score
             this.scoreboard.score++;
         }
