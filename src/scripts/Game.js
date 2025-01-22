@@ -15,6 +15,18 @@ export default class Game {
         this.ctx = /** @type {CanvasRenderingContext2D} */ (
             canvas.getContext("2d")
         );
+        // Handles canvas resize
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        // Dynamic resize
+        window.addEventListener(
+            "resize",
+            (event) => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            },
+            { passive: true }
+        );
     }
 
     /**
