@@ -45,19 +45,39 @@ export default class Game {
      * @private
      */
     render() {
-        this.ctx.beginPath();
+        // Clears
+        this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        // Draws
         this.ctx.fillStyle = "white";
         this.ctx.fillText("Hello World!", 16, 16);
-        this.ctx.closePath();
     }
 
     /**
      * Starts game
-     * @returns {void}
+     * @returns {Promise<void>}
      * @public
      */
-    run() {
-        this.update(0);
-        this.render();
+    async run() {
+        const treshold = 60 / 1000;
+        let prevTime = 0;
+        let deltaTime = 0;
+        /**
+         * Game loop callback function
+         * @param {number} currTime - Current time
+         * @returns {void}
+         */
+        function loop(currTime) {
+            deltaTime = currTime - prevTime;
+            if (deltaTime < treshold) {
+                requestAnimationFrame(loop.bind(this));
+                return;
+            }
+            prevTime = currTime;
+            this.update(deltaTime);
+            this.render();
+            requestAnimationFrame(loop.bind(this));
+        }
+        // Starts loop
+        requestAnimationFrame(loop.bind(this));
     }
 }
