@@ -164,6 +164,9 @@ export default class Game {
             this.ball.velocity.y +=
                 (this.ball.y - this.player.y) /
                 (this.ball.size + this.player.size);
+            // Random quirk to ball bounce
+            this.ball.velocity.x += Math.random() * this.ball.velocity.x * 0.1;
+            this.ball.velocity.y += Math.random() * this.ball.velocity.y * 0.1;
             // Prevents ball collapsing
             const diffAngle = Math.atan2(
                 Math.abs(this.ball.y - this.player.y),
