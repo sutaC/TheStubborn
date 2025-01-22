@@ -79,10 +79,26 @@ export default class Game {
     };
 
     /**
+     * @typedef {Object} Scoreboard
+     * @property {number} score Ball x position on the scene
+     * @property {number} bestScore Ball x position on the scene
+     */
+    /**
+     * @type {Scoreboard}
+     * @readonly
+     * @private
+     */
+    scoreboard = {
+        score: 0,
+        bestScore: 0,
+    };
+
+    /**
      * @param {HTMLCanvasElement} canvas Game canvas element
      */
     constructor(canvas) {
         this.inputHandler = new InputHandler();
+        // Setups canvas context
         this.ctx = /** @type {CanvasRenderingContext2D} */ (
             canvas.getContext("2d")
         );
@@ -97,6 +113,10 @@ export default class Game {
                 canvas.height = window.innerHeight;
             },
             { passive: true }
+        );
+        // Sets score
+        this.scoreboard.bestScore = Number.parseInt(
+            localStorage.getItem("bestScore") ?? "0"
         );
     }
 
@@ -116,13 +136,11 @@ export default class Game {
             this.player.velocity.x -= 0.01 * deltaTime;
             this.player.velocity.x = Math.max(-1, this.player.velocity.x);
         }
-
         if (this.player.velocity.x < 0) {
             this.player.velocity.x += 0.033;
         } else if (this.player.velocity.x > 0) {
             this.player.velocity.x -= 0.033;
         }
-
         this.player.x += this.player.velocity.x;
         if (this.player.x >= this.scene.size / 2 - this.player.size) {
             this.player.x = this.scene.size / 2 - this.player.size - 1;
@@ -137,6 +155,7 @@ export default class Game {
             ) <=
             this.player.size + this.ball.size
         ) {
+            // Bounces ball
             this.ball.velocity.x *= -0.33;
             this.ball.velocity.y *= -0.33;
             this.ball.velocity.x +=
@@ -145,21 +164,33 @@ export default class Game {
             this.ball.velocity.y +=
                 (this.ball.y - this.player.y) /
                 (this.ball.size + this.player.size);
+            // Adds score
+            this.scoreboard.score++;
         }
         // Ball
         this.ball.velocity.y -= 0.01;
         this.ball.x += this.ball.velocity.x;
         this.ball.y += this.ball.velocity.y;
-        if (
-            this.ball.x <= -this.scene.size / 2 + this.ball.size ||
-            this.ball.x >= this.scene.size / 2 - this.ball.size
-        ) {
+        // Wall collision
+        if (this.ball.x <= -this.scene.size / 2 + this.ball.size) {
+            this.ball.x = -this.scene.size / 2 + this.ball.size + 1;
+            this.ball.velocity.x *= -1;
+        } else if (this.ball.x >= this.scene.size / 2 - this.ball.size) {
+            this.ball.x = this.scene.size / 2 - this.ball.size - 1;
             this.ball.velocity.x *= -1;
         }
+        // Game over
         if (this.ball.y <= -this.scene.size / 2 + this.ball.size) {
-            // TODO:
-            // score = 0
-            // bestScore ?< = score
+            // Sets score
+            if (this.scoreboard.score > this.scoreboard.bestScore) {
+                this.scoreboard.bestScore = this.scoreboard.score;
+                localStorage.setItem(
+                    "bestScore",
+                    this.scoreboard.bestScore.toString()
+                );
+            }
+            // Sets ball position
+            this.scoreboard.score = 0;
             this.ball.x = 0;
             this.ball.y = 0;
             this.ball.velocity.x = 0;
@@ -205,6 +236,20 @@ export default class Game {
         );
         this.ctx.closePath();
         this.ctx.fill();
+        // Score
+        this.ctx.font = '24px "Courier New"';
+        this.ctx.fillText(
+            this.scoreboard.bestScore.toString().padStart(3, "0"),
+            this.ctx.canvas.width / 2 - 24,
+            this.ctx.canvas.height / 2 - this.scene.size / 3
+        );
+        this.ctx.font = '32px "Courier New"';
+
+        this.ctx.fillText(
+            this.scoreboard.score.toString().padStart(3, "0"),
+            this.ctx.canvas.width / 2 - 32,
+            this.ctx.canvas.height / 2 - this.scene.size / 5
+        );
     }
 
     /**
