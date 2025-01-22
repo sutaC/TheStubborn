@@ -75,7 +75,7 @@ export default class Game {
         x: 0,
         y: 0,
         size: 15,
-        velocity: { x: 0, y: 0 },
+        velocity: { x: 0, y: 0.5 },
     };
 
     /**
@@ -191,10 +191,12 @@ export default class Game {
             }
             // Sets ball position
             this.scoreboard.score = 0;
-            this.ball.x = 0;
+            this.ball.x =
+                (this.scene.size - this.ball.size) * Math.random() -
+                (this.scene.size + this.ball.size) / 2;
             this.ball.y = 0;
             this.ball.velocity.x = 0;
-            this.ball.velocity.y = 0;
+            this.ball.velocity.y = 0.5;
         }
     }
 
