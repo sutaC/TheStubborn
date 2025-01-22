@@ -2,6 +2,12 @@
 
 import InputHandler from "./InputHandler.js";
 
+/**
+ * @typedef {Object} Vec2d
+ * @property {number} x
+ * @property {number} y
+ */
+
 export default class Game {
     /**
      * @type {CanvasRenderingContext2D}
@@ -29,14 +35,14 @@ export default class Game {
      * @private
      */
     scene = {
-        size: 400,
+        size: 300,
         objectsColor: "#000000",
         backgroundColor: "#ffffff",
     };
 
     /**
      * @typedef {Object} Player
-     * @property {number} position Player x position on the scene
+     * @property {number} x Player x position on the scene
      * @property {number} size Player size
      * @property {number} speed Player speed
      */
@@ -46,9 +52,28 @@ export default class Game {
      * @private
      */
     player = {
-        position: 0,
-        size: 25,
+        x: 0,
+        size: 20,
         speed: 1,
+    };
+
+    /**
+     * @typedef {Object} Ball
+     * @property {number} x Ball x position on the scene
+     * @property {number} y Ball x position on the scene
+     * @property {number} size Ball size
+     * @property {Vec2d} velocity Ball valocity
+     */
+    /**
+     * @type {Ball}
+     * @readonly
+     * @private
+     */
+    ball = {
+        x: 0,
+        y: 0,
+        size: 15,
+        velocity: { x: 0, y: 0 },
     };
 
     /**
@@ -80,20 +105,36 @@ export default class Game {
      * @private
      */
     update(deltaTime) {
+        // Player
         if (this.inputHandler.isHeld("ArrowRight")) {
-            this.player.position += (this.player.speed / 10) * deltaTime;
-            if (this.player.position > this.scene.size / 2 - this.player.size) {
-                this.player.position = this.scene.size / 2 - this.player.size;
+            this.player.x += (this.player.speed / 10) * deltaTime;
+            if (this.player.x >= this.scene.size / 2 - this.player.size) {
+                this.player.x = this.scene.size / 2 - this.player.size - 1;
             }
         }
         if (this.inputHandler.isHeld("ArrowLeft")) {
-            this.player.position -= (this.player.speed / 10) * deltaTime;
-            if (
-                this.player.position <
-                -this.scene.size / 2 + this.player.size
-            ) {
-                this.player.position = -this.scene.size / 2 + this.player.size;
+            this.player.x -= (this.player.speed / 10) * deltaTime;
+            if (this.player.x <= -this.scene.size / 2 + this.player.size) {
+                this.player.x = -this.scene.size / 2 + this.player.size + 1;
             }
+        }
+        // Ball
+        this.ball.velocity.y -= 0.01;
+        this.ball.x += this.ball.velocity.x;
+        this.ball.y += this.ball.velocity.y;
+        if (
+            this.ball.x <= -this.scene.size / 2 + this.ball.size ||
+            this.ball.x >= this.scene.size / 2 - this.ball.size
+        ) {
+            this.ball.velocity.x *= -1;
+        }
+        if (this.ball.y <= -this.scene.size / 2 + this.ball.size) {
+            // TODO:
+            // score = 0
+            // bestScore ?< = score
+            this.ball.y = 0;
+            this.ball.velocity.x = 0;
+            this.ball.velocity.y = 0;
         }
     }
 
@@ -115,12 +156,21 @@ export default class Game {
             this.scene.size
         );
         // Objects
+        // Player
         this.ctx.fillStyle = this.scene.objectsColor;
         this.ctx.beginPath();
         this.ctx.arc(
-            this.ctx.canvas.width / 2 + this.player.position,
+            this.ctx.canvas.width / 2 + this.player.x,
             this.ctx.canvas.height / 2 + this.scene.size / 2 - this.player.size,
             this.player.size,
+            0,
+            2 * Math.PI
+        );
+        // Ball
+        this.ctx.arc(
+            this.ctx.canvas.width / 2 + this.ball.x,
+            this.ctx.canvas.height / 2 - this.ball.y,
+            this.ball.size,
             0,
             2 * Math.PI
         );
