@@ -26,8 +26,7 @@ export default class Game {
     /**
      * @typedef {Object} Scene
      * @property {number} size
-     * @property {string} objectsColor
-     * @property {string} backgroundColor
+     * @property {{object: string, background: string}[]} colors
      */
     /**
      * @type {Scene}
@@ -36,8 +35,18 @@ export default class Game {
      */
     scene = {
         size: 300,
-        objectsColor: "#000000",
-        backgroundColor: "#ffffff",
+        colors: [
+            { object: "#A09745", background: "#F5DF18" },
+            { object: "#A0845F", background: "#F5A63F" },
+            { object: "#A05F55", background: "#F54B32" },
+            { object: "#A05C99", background: "#F53BE3" },
+            { object: "#933BA1", background: "#D609F4" },
+            { object: "#5A84A0", background: "#38A9F5" },
+            { object: "#57A09A", background: "#33F4E3" },
+            { object: "#55A081", background: "#32F5A4" },
+            { object: "#50A062", background: "#2AF456" },
+            { object: "#70A048", background: "#7FF51D" },
+        ],
     };
 
     /**
@@ -224,11 +233,12 @@ export default class Game {
      * @private
      */
     render() {
+        const colorIdx = Math.floor(this.scoreboard.score / 100);
         // Clears canvas
-        this.ctx.fillStyle = this.scene.objectsColor;
+        this.ctx.fillStyle = this.scene.colors[colorIdx].object;
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         // Draws board
-        this.ctx.fillStyle = this.scene.backgroundColor;
+        this.ctx.fillStyle = this.scene.colors[colorIdx].background;
         this.ctx.fillRect(
             this.ctx.canvas.width / 2 - this.scene.size / 2,
             this.ctx.canvas.height / 2 - this.scene.size / 2,
@@ -237,7 +247,7 @@ export default class Game {
         );
         // Objects
         // Player
-        this.ctx.fillStyle = this.scene.objectsColor;
+        this.ctx.fillStyle = this.scene.colors[colorIdx].object;
         this.ctx.beginPath();
         this.ctx.arc(
             this.ctx.canvas.width / 2 + this.player.x,
@@ -257,13 +267,13 @@ export default class Game {
         this.ctx.closePath();
         this.ctx.fill();
         // Score
-        this.ctx.font = '24px "Courier New"';
+        this.ctx.font = 'bold 24px "Courier New"';
         this.ctx.fillText(
             this.scoreboard.bestScore.toString().padStart(3, "0"),
             this.ctx.canvas.width / 2 - 24,
             this.ctx.canvas.height / 2 - this.scene.size / 3
         );
-        this.ctx.font = '32px "Courier New"';
+        this.ctx.font = 'bold 32px "Courier"';
 
         this.ctx.fillText(
             this.scoreboard.score.toString().padStart(3, "0"),
