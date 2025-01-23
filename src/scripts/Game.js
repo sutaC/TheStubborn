@@ -55,6 +55,7 @@ export default class Game {
      * @property {number} y Player y position on the scene
      * @property {number} size Player size
      * @property {Vec2d} velocity Ball valocity
+     * @property {number} maxSpeed Ball maximal speed
      */
     /**
      * @type {Player}
@@ -66,6 +67,7 @@ export default class Game {
         y: 0,
         size: 20,
         velocity: { x: 0, y: 0 },
+        maxSpeed: 1.25,
     };
 
     /**
@@ -139,11 +141,17 @@ export default class Game {
         // Player movement
         this.player.y = -this.scene.size / 2 + this.player.size;
         if (this.inputHandler.isHeld("ArrowRight")) {
-            this.player.velocity.x += 0.01 * deltaTime;
-            this.player.velocity.x = Math.min(1, this.player.velocity.x);
+            this.player.velocity.x += 0.025 * deltaTime;
+            this.player.velocity.x = Math.min(
+                this.player.maxSpeed,
+                this.player.velocity.x
+            );
         } else if (this.inputHandler.isHeld("ArrowLeft")) {
-            this.player.velocity.x -= 0.01 * deltaTime;
-            this.player.velocity.x = Math.max(-1, this.player.velocity.x);
+            this.player.velocity.x -= 0.025 * deltaTime;
+            this.player.velocity.x = Math.max(
+                -this.player.maxSpeed,
+                this.player.velocity.x
+            );
         }
         if (this.player.velocity.x < 0) {
             this.player.velocity.x += 0.033;
@@ -157,7 +165,7 @@ export default class Game {
             this.player.x = -this.scene.size / 2 + this.player.size + 1;
         }
         // Ball movement
-        this.ball.velocity.y -= 0.01; // Gravity
+        this.ball.velocity.y -= 0.015; // Gravity
         this.ball.x += this.ball.velocity.x;
         this.ball.y += this.ball.velocity.y;
         // Objects collision
@@ -178,8 +186,8 @@ export default class Game {
                 (this.ball.y - this.player.y) /
                 (this.ball.size + this.player.size);
             // Random quirk to ball bounce
-            this.ball.velocity.x += Math.random() * this.ball.velocity.x * 0.1;
-            this.ball.velocity.y += Math.random() * this.ball.velocity.y * 0.1;
+            this.ball.velocity.x += (Math.random() * this.ball.velocity.x) / 2;
+            this.ball.velocity.y += (Math.random() * this.ball.velocity.y) / 2;
             // Prevents ball collapsing
             const diffAngle = Math.atan2(
                 Math.abs(this.ball.y - this.player.y),
@@ -206,8 +214,11 @@ export default class Game {
             this.ball.x = this.scene.size / 2 - this.ball.size - 1;
             this.ball.velocity.x *= -1;
         }
-        // Game over
-        if (this.ball.y <= -this.scene.size / 2 + this.ball.size) {
+        if (this.ball.y >= this.scene.size / 2 - this.ball.size) {
+            this.ball.y = this.scene.size / 2 - this.ball.size - 1;
+            this.ball.velocity.y *= -1;
+        } else if (this.ball.y <= -this.scene.size / 2 + this.ball.size) {
+            // Game over
             // Sets score
             if (this.scoreboard.score > this.scoreboard.bestScore) {
                 this.scoreboard.bestScore = this.scoreboard.score;
@@ -292,10 +303,10 @@ export default class Game {
 
     /**
      * Starts game
-     * @returns {Promise<void>}
+     * @returns {void}
      * @public
      */
-    async run() {
+    run() {
         const treshold = 60 / 1000;
         let prevTime = 0;
         let deltaTime = 0;
