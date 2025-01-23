@@ -143,14 +143,14 @@ export default class Game {
         // Player movement
         this.player.y = -this.scene.size / 2 + this.player.size;
         if (this.inputHandler.isHeld("ArrowRight")) {
-            this.player.velocity.x += 0.025 * deltaTime;
+            this.player.velocity.x += deltaTime / 10;
             this.player.velocity.x = Math.min(
                 this.player.maxSpeed,
                 this.player.velocity.x
             );
             this.player.direction = false;
         } else if (this.inputHandler.isHeld("ArrowLeft")) {
-            this.player.velocity.x -= 0.025 * deltaTime;
+            this.player.velocity.x -= deltaTime / 10;
             this.player.velocity.x = Math.max(
                 -this.player.maxSpeed,
                 this.player.velocity.x
@@ -169,9 +169,9 @@ export default class Game {
             this.player.x = -this.scene.size / 2 + this.player.size + 1;
         }
         // Ball movement
-        this.ball.velocity.y -= 0.015; // Gravity
-        this.ball.x += this.ball.velocity.x;
-        this.ball.y += this.ball.velocity.y;
+        this.ball.velocity.y -= deltaTime / 500; // Gravity
+        this.ball.x += this.ball.velocity.x * (deltaTime / 7);
+        this.ball.y += this.ball.velocity.y * (deltaTime / 7);
         // Objects collision
         if (
             Math.sqrt(
