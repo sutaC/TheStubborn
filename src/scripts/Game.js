@@ -127,7 +127,7 @@ export default class Game {
      * @private
      */
     update(deltaTime) {
-        // Player
+        // Player movement
         this.player.y = -this.scene.size / 2 + this.player.size;
         if (this.inputHandler.isHeld("ArrowRight")) {
             this.player.velocity.x += 0.01 * deltaTime;
@@ -147,6 +147,10 @@ export default class Game {
         } else if (this.player.x <= -this.scene.size / 2 + this.player.size) {
             this.player.x = -this.scene.size / 2 + this.player.size + 1;
         }
+        // Ball movement
+        this.ball.velocity.y -= 0.01; // Gravity
+        this.ball.x += this.ball.velocity.x;
+        this.ball.y += this.ball.velocity.y;
         // Objects collision
         if (
             Math.sqrt(
@@ -184,11 +188,7 @@ export default class Game {
             // Adds score
             this.scoreboard.score++;
         }
-        // Ball
-        this.ball.velocity.y -= 0.01;
-        this.ball.x += this.ball.velocity.x;
-        this.ball.y += this.ball.velocity.y;
-        // Wall collision
+        // Ball wall collision
         if (this.ball.x <= -this.scene.size / 2 + this.ball.size) {
             this.ball.x = -this.scene.size / 2 + this.ball.size + 1;
             this.ball.velocity.x *= -1;
