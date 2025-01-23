@@ -2,12 +2,29 @@
     box-sizing: border-box;
 }
 
+html {
+    font-family: "Courier New", Courier, monospace;
+}
+
 body {
     margin: 0;
     min-height: 100vh;
     overflow: hidden;
+    --clr-primary: #000000; /* changed by js */
+    --clr-secondary: #ffffff; /* changed by js */
 }
 
 #gameCanvas {
     background: black;
+}
+
+#refA {
+    display: block;
+    position: absolute;
+    left: 50%;
+    bottom: 0.725rem;
+    translate: -50% 0;
+    font-size: 0.725rem;
+    font-weight: bold;
+    color: var(--clr-primary);
 }
