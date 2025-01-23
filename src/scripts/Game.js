@@ -187,6 +187,7 @@ export default class Game {
                 Math.sin(diffAngle) * (this.ball.size + this.player.size);
             // Adds score
             this.scoreboard.score++;
+            this.scoreboard.score %= 1000; // Rolls back at 1000
         }
         // Ball wall collision
         if (this.ball.x <= -this.scene.size / 2 + this.ball.size) {
