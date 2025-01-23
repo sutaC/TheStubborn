@@ -234,6 +234,14 @@ export default class Game {
      */
     render() {
         const colorIdx = Math.floor(this.scoreboard.score / 100);
+        document.body.style.setProperty(
+            "--clr-primary",
+            this.scene.colors[colorIdx].background
+        );
+        document.body.style.setProperty(
+            "--clr-secondary",
+            this.scene.colors[colorIdx].object
+        );
         // Clears canvas
         this.ctx.fillStyle = this.scene.colors[colorIdx].object;
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
