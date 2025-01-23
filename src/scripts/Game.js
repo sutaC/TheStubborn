@@ -54,8 +54,9 @@ export default class Game {
      * @property {number} x Player x position on the scene
      * @property {number} y Player y position on the scene
      * @property {number} size Player size
-     * @property {Vec2d} velocity Ball valocity
-     * @property {number} maxSpeed Ball maximal speed
+     * @property {Vec2d} velocity Player valocity
+     * @property {number} maxSpeed Player maximal speed
+     * @property {boolean} direction Player direction (true means left and right means right)
      */
     /**
      * @type {Player}
@@ -68,6 +69,7 @@ export default class Game {
         size: 20,
         velocity: { x: 0, y: 0 },
         maxSpeed: 1.25,
+        direction: true,
     };
 
     /**
@@ -146,12 +148,14 @@ export default class Game {
                 this.player.maxSpeed,
                 this.player.velocity.x
             );
+            this.player.direction = false;
         } else if (this.inputHandler.isHeld("ArrowLeft")) {
             this.player.velocity.x -= 0.025 * deltaTime;
             this.player.velocity.x = Math.max(
                 -this.player.maxSpeed,
                 this.player.velocity.x
             );
+            this.player.direction = true;
         }
         if (this.player.velocity.x < 0) {
             this.player.velocity.x += 0.033;
@@ -255,6 +259,7 @@ export default class Game {
         );
         // Clears canvas
         this.ctx.fillStyle = this.scene.colors[colorIdx].object;
+        this.ctx.strokeStyle = this.scene.colors[colorIdx].background;
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         // Draws board
         this.ctx.fillStyle = this.scene.colors[colorIdx].background;
@@ -268,20 +273,94 @@ export default class Game {
         // Player
         this.ctx.fillStyle = this.scene.colors[colorIdx].object;
         this.ctx.beginPath();
-        this.ctx.arc(
-            this.ctx.canvas.width / 2 + this.player.x,
-            this.ctx.canvas.height / 2 + this.scene.size / 2 - this.player.size,
-            this.player.size,
-            0,
-            2 * Math.PI
+        this.ctx.rect(
+            // Body
+            this.ctx.canvas.width / 2 + this.player.x - this.player.size * 0.7,
+            this.ctx.canvas.height / 2 - this.player.y - this.player.size,
+            this.player.size * 1.4,
+            this.player.size * 1.4
         );
+        this.ctx.rect(
+            // Leg Right
+            this.ctx.canvas.width / 2 + this.player.x + this.player.size * 0.3,
+            this.ctx.canvas.height / 2 - this.player.y + this.player.size * 0.4,
+            this.player.size * 0.2,
+            this.player.size * 0.6
+        );
+        this.ctx.rect(
+            // Legs Left
+            this.ctx.canvas.width / 2 + this.player.x - this.player.size * 0.5,
+            this.ctx.canvas.height / 2 - this.player.y + this.player.size * 0.4,
+            this.player.size * 0.2,
+            this.player.size * 0.6
+        );
+        if (this.player.direction) {
+            // Left
+            this.ctx.rect(
+                // Beak
+                this.ctx.canvas.width / 2 + this.player.x - this.player.size,
+                this.ctx.canvas.height / 2 -
+                    this.player.y -
+                    this.player.size * 0.45,
+                this.player.size * 0.4,
+                this.player.size * 0.3
+            );
+        } else {
+            // Right
+            this.ctx.rect(
+                // Beak
+                this.ctx.canvas.width / 2 +
+                    this.player.x +
+                    this.player.size * 0.6,
+                this.ctx.canvas.height / 2 -
+                    this.player.y -
+                    this.player.size * 0.45,
+                this.player.size * 0.4,
+                this.player.size * 0.3
+            );
+        }
+        this.ctx.closePath();
+        this.ctx.fill();
+        if (this.player.direction) {
+            // Left
+            this.ctx.strokeRect(
+                // Eye
+                this.ctx.canvas.width / 2 +
+                    this.player.x -
+                    this.player.size * 0.5,
+                this.ctx.canvas.height / 2 -
+                    this.player.y -
+                    this.player.size * 0.7,
+                this.player.size * 0.2,
+                this.player.size * 0.2
+            );
+        } else {
+            // Right
+            this.ctx.strokeRect(
+                // Eye
+                this.ctx.canvas.width / 2 +
+                    this.player.x +
+                    this.player.size * 0.3,
+                this.ctx.canvas.height / 2 -
+                    this.player.y -
+                    this.player.size * 0.7,
+                this.player.size * 0.2,
+                this.player.size * 0.2
+            );
+        }
         // Ball
-        this.ctx.arc(
-            this.ctx.canvas.width / 2 + this.ball.x,
-            this.ctx.canvas.height / 2 - this.ball.y,
-            this.ball.size,
-            0,
-            2 * Math.PI
+        this.ctx.beginPath();
+        this.ctx.rect(
+            this.ctx.canvas.width / 2 + this.ball.x - this.ball.size * 0.7,
+            this.ctx.canvas.height / 2 - this.ball.y - this.ball.size,
+            this.ball.size * 1.4,
+            this.ball.size * 2
+        );
+        this.ctx.rect(
+            this.ctx.canvas.width / 2 + this.ball.x - this.ball.size,
+            this.ctx.canvas.height / 2 - this.ball.y - this.ball.size * 0.7,
+            this.ball.size * 2,
+            this.ball.size * 1.4
         );
         this.ctx.closePath();
         this.ctx.fill();
