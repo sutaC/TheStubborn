@@ -10,7 +10,7 @@ Your goal is to bounce the ball as many times as possible! Sounds simple, right?
 
 **Desktop:** Use left and right arrows
 
-~~**Mobile:** Touch left and right sides of the screen~~ _(in construction)_
+**Mobile:** Touch left and right sides of the screen
 
 ## How to develop?
 
