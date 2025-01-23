@@ -68,7 +68,7 @@ export default class Game {
         y: 0,
         size: 20,
         velocity: { x: 0, y: 0 },
-        maxSpeed: 1.25,
+        maxSpeed: 1.75,
         direction: true,
     };
 
@@ -118,12 +118,14 @@ export default class Game {
         // Handles canvas resize
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
+        this.player.y = -this.scene.size / 2 + this.player.size;
         // Dynamic resize
         window.addEventListener(
             "resize",
             (event) => {
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
+                this.player.y = -this.scene.size / 2 + this.player.size;
             },
             { passive: true }
         );
@@ -141,7 +143,6 @@ export default class Game {
      */
     update(deltaTime) {
         // Player movement
-        this.player.y = -this.scene.size / 2 + this.player.size;
         if (this.inputHandler.isHeld("ArrowRight")) {
             this.player.velocity.x += deltaTime / 10;
             this.player.velocity.x = Math.min(
@@ -158,9 +159,13 @@ export default class Game {
             this.player.direction = true;
         }
         if (this.player.velocity.x < 0) {
-            this.player.velocity.x += 0.033;
+            if (this.player.velocity.x >= deltaTime / 100)
+                this.player.velocity.x = 0;
+            else this.player.velocity.x += deltaTime / 100;
         } else if (this.player.velocity.x > 0) {
-            this.player.velocity.x -= 0.033;
+            if (this.player.velocity.x <= deltaTime / 100)
+                this.player.velocity.x = 0;
+            else this.player.velocity.x -= deltaTime / 100;
         }
         this.player.x += this.player.velocity.x;
         if (this.player.x >= this.scene.size / 2 - this.player.size) {
@@ -202,10 +207,11 @@ export default class Game {
                 this.player.x +
                 (this.ball.x < this.player.x ? -1 : 1) *
                     Math.cos(diffAngle) *
-                    (this.ball.size + this.player.size);
+                    (this.ball.size + this.player.size + 1);
+
             this.ball.y =
                 this.player.y +
-                Math.sin(diffAngle) * (this.ball.size + this.player.size);
+                Math.sin(diffAngle) * (this.ball.size + this.player.size + 1);
             // Adds score
             this.scoreboard.score++;
             this.scoreboard.score %= 1000; // Rolls back at 1000
