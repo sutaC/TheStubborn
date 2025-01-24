@@ -1,6 +1,7 @@
 // @ts-check
 
 import InputHandler from "./InputHandler.js";
+import SoundHandler from "./SoundHandler.js";
 
 /**
  * @typedef {Object} Vec2d
@@ -22,6 +23,13 @@ export default class Game {
      * @private
      */
     inputHandler;
+
+    /**
+     * @type {SoundHandler}
+     * @readonly
+     * @private
+     */
+    soundHandler;
 
     /**
      * @typedef {Object} Scene
@@ -111,6 +119,9 @@ export default class Game {
      */
     constructor(canvas) {
         this.inputHandler = new InputHandler();
+        // Setups sounds
+        this.soundHandler = new SoundHandler();
+        this.soundHandler.addSound("/sounds/test.mp3", "test"); // debug
         // Setups canvas context
         this.ctx = /** @type {CanvasRenderingContext2D} */ (
             canvas.getContext("2d")
@@ -215,6 +226,8 @@ export default class Game {
             // Adds score
             this.scoreboard.score++;
             this.scoreboard.score %= 1000; // Rolls back at 1000
+            // Plays sound
+            this.soundHandler.playSound("test");
         }
         // Ball wall collision
         if (this.ball.x <= -this.scene.size / 2 + this.ball.size) {
