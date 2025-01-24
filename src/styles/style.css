@@ -27,4 +27,5 @@ body {
     font-size: 0.725rem;
     font-weight: bold;
     color: var(--clr-primary);
+    user-select: none;
 }
