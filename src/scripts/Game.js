@@ -121,8 +121,8 @@ export default class Game {
         this.inputHandler = new InputHandler();
         // Setups sounds
         this.soundHandler = new SoundHandler();
-        this.soundHandler.addSound("/sounds/bounce.mp3", "bounce");
-        this.soundHandler.addSound("/sounds/destroy.mp3", "destroy");
+        this.soundHandler.addSound("./sounds/bounce.mp3", "bounce");
+        this.soundHandler.addSound("./sounds/destroy.mp3", "destroy");
         // Setups canvas context
         this.ctx = /** @type {CanvasRenderingContext2D} */ (
             canvas.getContext("2d")
