@@ -1,6 +1,7 @@
 // @ts-check
 
 import InputHandler from "./InputHandler.js";
+import SoundHandler from "./SoundHandler.js";
 
 /**
  * @typedef {Object} Vec2d
@@ -22,6 +23,13 @@ export default class Game {
      * @private
      */
     inputHandler;
+
+    /**
+     * @type {SoundHandler}
+     * @readonly
+     * @private
+     */
+    soundHandler;
 
     /**
      * @typedef {Object} Scene
@@ -68,7 +76,7 @@ export default class Game {
         y: 0,
         size: 20,
         velocity: { x: 0, y: 0 },
-        maxSpeed: 1.75,
+        maxSpeed: 1.9,
         direction: true,
     };
 
@@ -111,6 +119,10 @@ export default class Game {
      */
     constructor(canvas) {
         this.inputHandler = new InputHandler();
+        // Setups sounds
+        this.soundHandler = new SoundHandler();
+        this.soundHandler.addSound("/sounds/bounce.mp3", "bounce");
+        this.soundHandler.addSound("/sounds/destroy.mp3", "destroy");
         // Setups canvas context
         this.ctx = /** @type {CanvasRenderingContext2D} */ (
             canvas.getContext("2d")
@@ -215,18 +227,23 @@ export default class Game {
             // Adds score
             this.scoreboard.score++;
             this.scoreboard.score %= 1000; // Rolls back at 1000
+            // Plays sound
+            this.soundHandler.playSound("bounce");
         }
         // Ball wall collision
         if (this.ball.x <= -this.scene.size / 2 + this.ball.size) {
             this.ball.x = -this.scene.size / 2 + this.ball.size + 1;
             this.ball.velocity.x *= -1;
+            this.soundHandler.playSound("bounce");
         } else if (this.ball.x >= this.scene.size / 2 - this.ball.size) {
             this.ball.x = this.scene.size / 2 - this.ball.size - 1;
             this.ball.velocity.x *= -1;
+            this.soundHandler.playSound("bounce");
         }
         if (this.ball.y >= this.scene.size / 2 - this.ball.size) {
             this.ball.y = this.scene.size / 2 - this.ball.size - 1;
             this.ball.velocity.y *= -1;
+            this.soundHandler.playSound("bounce");
         } else if (this.ball.y <= -this.scene.size / 2 + this.ball.size) {
             // Game over
             // Sets score
@@ -245,6 +262,7 @@ export default class Game {
             this.ball.y = 0;
             this.ball.velocity.x = 0;
             this.ball.velocity.y = 0.5;
+            this.soundHandler.playSound("destroy");
         }
     }
 
