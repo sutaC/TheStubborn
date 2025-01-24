@@ -16,7 +16,13 @@ export default class SoundHandler {
      * @public
      */
     addSound(src, name) {
-        const sound = new Audio(src);
+        let sound;
+        try {
+            sound = new Audio(src);
+        } catch (error) {
+            console.error(`Could not load sound '${name}'\n`, error);
+            return;
+        }
         sound.autoplay = true;
         this.sounds.set(name, sound);
     }

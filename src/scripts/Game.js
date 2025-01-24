@@ -121,7 +121,8 @@ export default class Game {
         this.inputHandler = new InputHandler();
         // Setups sounds
         this.soundHandler = new SoundHandler();
-        this.soundHandler.addSound("/sounds/test.mp3", "test"); // debug
+        this.soundHandler.addSound("/sounds/bounce.mp3", "bounce");
+        this.soundHandler.addSound("/sounds/destroy.mp3", "destroy");
         // Setups canvas context
         this.ctx = /** @type {CanvasRenderingContext2D} */ (
             canvas.getContext("2d")
@@ -227,19 +228,22 @@ export default class Game {
             this.scoreboard.score++;
             this.scoreboard.score %= 1000; // Rolls back at 1000
             // Plays sound
-            this.soundHandler.playSound("test");
+            this.soundHandler.playSound("bounce");
         }
         // Ball wall collision
         if (this.ball.x <= -this.scene.size / 2 + this.ball.size) {
             this.ball.x = -this.scene.size / 2 + this.ball.size + 1;
             this.ball.velocity.x *= -1;
+            this.soundHandler.playSound("bounce");
         } else if (this.ball.x >= this.scene.size / 2 - this.ball.size) {
             this.ball.x = this.scene.size / 2 - this.ball.size - 1;
             this.ball.velocity.x *= -1;
+            this.soundHandler.playSound("bounce");
         }
         if (this.ball.y >= this.scene.size / 2 - this.ball.size) {
             this.ball.y = this.scene.size / 2 - this.ball.size - 1;
             this.ball.velocity.y *= -1;
+            this.soundHandler.playSound("bounce");
         } else if (this.ball.y <= -this.scene.size / 2 + this.ball.size) {
             // Game over
             // Sets score
@@ -258,6 +262,7 @@ export default class Game {
             this.ball.y = 0;
             this.ball.velocity.x = 0;
             this.ball.velocity.y = 0.5;
+            this.soundHandler.playSound("destroy");
         }
     }
 
