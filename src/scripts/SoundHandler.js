@@ -2,11 +2,18 @@
 
 export default class SoundHandler {
     /**
-     * @type {Map<string, HTMLAudioElement>}
+     * @type {Map<string, {sound: HTMLAudioElement, counter: number}>}
      * @readonly
      * @private
      */
     sounds = new Map();
+
+    /**
+     * Limit of simultaneous single sound plays (>=0)
+     * @type {number}
+     * @public
+     */
+    soundsLimit = 3;
 
     /**
      * Adds sound to handler
@@ -24,7 +31,7 @@ export default class SoundHandler {
             return;
         }
         sound.autoplay = true;
-        this.sounds.set(name, sound);
+        this.sounds.set(name, { sound, counter: 0 });
     }
 
     /**
@@ -53,17 +60,27 @@ export default class SoundHandler {
      * @public
      */
     playSound(name) {
-        const sound = this.sounds.get(name);
-        if (sound === undefined) {
+        const soundObj = this.sounds.get(name);
+        if (soundObj === undefined) {
             console.error(`Tried to play sound '${name}' and it was not found`);
             return;
         }
-        sound.pause();
-        sound.currentTime = 0;
-        try {
-            sound.play();
-        } catch (error) {
-            console.error(`Failed to play sound '${name}'.\n`, error);
+        if (soundObj.counter >= this.soundsLimit) {
+            return;
         }
+        const cpSound = /** @type {HTMLAudioElement} */ (
+            soundObj.sound.cloneNode()
+        );
+        soundObj.counter++;
+        cpSound.addEventListener(
+            "ended",
+            (event) => {
+                soundObj.counter--;
+            },
+            { once: true, passive: true }
+        );
+        cpSound.play().catch((error) => {
+            console.error(`Failed to play sound '${name}'.\n`, error);
+        });
     }
 }
