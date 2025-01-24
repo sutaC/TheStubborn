@@ -68,7 +68,7 @@ export default class Game {
         y: 0,
         size: 20,
         velocity: { x: 0, y: 0 },
-        maxSpeed: 1.75,
+        maxSpeed: 1.9,
         direction: true,
     };
 
